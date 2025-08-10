@@ -4,6 +4,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+src/main/generated/
+build/generated/
 
 ### STS ###
 .apt_generated
@@ -35,3 +37,14 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### apple ###
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
+
+### yml ###
+src/main/resources/application-local.yml
+src/main/resources/application-prod.yml
+src/main/resources/application-secret.yml
