@@ -61,10 +61,10 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
 	// ModelMapper
-	implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.4.2'
+	implementation 'org.modelmapper:modelmapper:2.4.2'
 
 	// Validation
-	implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.0'
+	implementation 'jakarta.validation:jakarta.validation-api:3.1.0'
 }
 
 tasks.named('test') {
