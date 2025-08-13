@@ -9,9 +9,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import popcong.app.adapter.in.jwt.CustomOAuth2UserService;
 import popcong.app.adapter.in.jwt.JwtFilter;
 import popcong.app.adapter.in.jwt.handler.AuthenticationFailureHandler;
 import popcong.app.adapter.in.jwt.handler.AuthorizationFailureHandler;
+import popcong.app.adapter.in.jwt.handler.OAuth2SuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -24,6 +26,9 @@ public class SecurityConfig {
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AuthorizationFailureHandler authorizationFailureHandler;
+
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     /**
      * SpringSecurity 보안 규칙 설정
@@ -55,7 +60,13 @@ public class SecurityConfig {
                 .exceptionHandling(exceptions ->
                         exceptions.authenticationEntryPoint(authenticationFailureHandler)
                                 .accessDeniedHandler(authorizationFailureHandler)
+                )
+                .oauth2Login(oauth2 ->
+                        oauth2.userInfoEndpoint(userInfo ->
+                                userInfo.userService(customOAuth2UserService)
+                        ).successHandler(oAuth2SuccessHandler)
                 );
+        ;
 
         return http.build();
     }
