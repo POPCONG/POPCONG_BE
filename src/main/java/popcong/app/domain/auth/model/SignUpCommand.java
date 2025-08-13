@@ -4,5 +4,5 @@ public record SignUpCommand (
         String name,
         String introduction,
         String profileImageUrl,
-        Boolean userRole
+        Boolean isUploaded
 ) {}
