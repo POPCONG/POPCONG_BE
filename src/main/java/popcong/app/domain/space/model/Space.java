@@ -17,6 +17,7 @@ public record Space(
         Double area,
         Double rating,
         String address,
+        String location,
         Double latitude,
         Double longitude,
         Status status,

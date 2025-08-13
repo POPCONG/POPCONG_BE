@@ -73,6 +73,9 @@ public class SpaceJpaEntity {
     @Column(name = "address", nullable = false, length = 50)
     private String address;
 
+    @Column(name = "location", length = 30)
+    private String location;
+
     @Column(name = "latitude", nullable = false)
     private Double latitude;
 
