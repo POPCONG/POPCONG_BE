@@ -6,7 +6,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import popcong.app.adapter.in.jwt.JwtFilter;
+import popcong.app.adapter.in.jwt.handler.AuthenticationFailureHandler;
+import popcong.app.adapter.in.jwt.handler.AuthorizationFailureHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -14,6 +19,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final SecurityProperties securityProperties;
+
+    private final JwtFilter jwtFilter;
+
+    private final AuthenticationFailureHandler authenticationFailureHandler;
+    private final AuthorizationFailureHandler authorizationFailureHandler;
 
     /**
      * SpringSecurity 보안 규칙 설정
@@ -25,12 +35,26 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                // STATELESS로 세션 관리
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                // 필터 체인에 커스텀 필터 추가
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                // 요청 별 접근 권한 설정
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers(securityProperties.getPermitAll().toArray(new String[0]))
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
+                )
+                // security exception 핸들러
+                .exceptionHandling(exceptions ->
+                        exceptions.authenticationEntryPoint(authenticationFailureHandler)
+                                .accessDeniedHandler(authorizationFailureHandler)
                 );
 
         return http.build();
