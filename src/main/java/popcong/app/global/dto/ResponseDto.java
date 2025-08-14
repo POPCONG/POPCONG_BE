@@ -1,37 +1,32 @@
 package popcong.app.global.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
 
-@Getter
-@AllArgsConstructor
-public class ResponseDto<T> {
-
-    private final String statusCode;
-    private final String message;
-    private final T data;
-
+public record ResponseDto<T>(
+        int statusCode,
+        String message,
+        T data
+) {
     // data -> X
-    public static <T> ResponseDto<T> res(
+    public static <T> ResponseDto<T> success(
             final HttpStatusCode statusCode,
             final String message
     ) {
         return new ResponseDto<>(
-                String.valueOf(statusCode.value()),
+                statusCode.value(),
                 message,
                 null
         );
     }
 
     // data -> O
-    public static <T> ResponseDto<T> res(
+    public static <T> ResponseDto<T> success(
             final HttpStatusCode statusCode,
             final String message,
             final T data
     ) {
         return new ResponseDto<>(
-                String.valueOf(statusCode.value()),
+                statusCode.value(),
                 message,
                 data
         );

@@ -1,5 +1,5 @@
 package popcong.app.domain.user.model;
 
 public enum Provider {
-    KAKAO
+    kakao
 }
