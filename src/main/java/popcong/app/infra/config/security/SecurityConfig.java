@@ -30,10 +30,10 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
+    private final SignInRedirectCaptureFilter signInRedirectCaptureFilter;
+
     /**
      * SpringSecurity 보안 규칙 설정
-     * CSRF 비활성화
-     * SecurityProperties의 path 접근 허용 (permit-all)
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -42,10 +42,12 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                // STATELESS로 세션 관리
+                // 세션 상태 필요 (oauth2)
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
+                // redirect 파라미터 쿠키 저장
+                .addFilterBefore(signInRedirectCaptureFilter, UsernamePasswordAuthenticationFilter.class)
                 // 필터 체인에 커스텀 필터 추가
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 // 요청 별 접근 권한 설정
@@ -62,9 +64,8 @@ public class SecurityConfig {
                                 .accessDeniedHandler(authorizationFailureHandler)
                 )
                 .oauth2Login(oauth2 ->
-                        oauth2.userInfoEndpoint(userInfo ->
-                                userInfo.userService(customOAuth2UserService)
-                        ).successHandler(oAuth2SuccessHandler)
+                        oauth2.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                                .successHandler(oAuth2SuccessHandler)
                 );
         ;
 

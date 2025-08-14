@@ -1,6 +1,6 @@
 package popcong.app.adapter.out.oauth;
 
-import popcong.app.domain.auth.port.out.OAuth2UserInfoPort;
+import popcong.app.application.auth.port.out.OAuth2UserInfoPort;
 import popcong.app.domain.user.model.Provider;
 import popcong.app.global.exception.custom.BusinessException;
 import popcong.app.global.exception.error.AuthErrorCode;
@@ -17,7 +17,7 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfoPort {
 
     @Override
     public String getProviderId() {
-        return Provider.kakao + attributes.get("id").toString();
+        return attributes.get("id").toString();
     }
 
     @Override

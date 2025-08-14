@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 public class UserJpaEntity {
 
     @Id
+    @Column(name = "")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

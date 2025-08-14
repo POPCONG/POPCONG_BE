@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import popcong.app.adapter.out.jwt.JwtUtils;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +24,20 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
+
+    private static final List<String> WHITE_LIST = List.of(
+            "/oauth2/",
+            "/login/oauth2/",
+            "/swagger-ui/",
+            "/v3/api-docs/",
+            "/swagger-ui.html"
+    );
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return WHITE_LIST.stream().anyMatch(uri::startsWith);
+    }
 
     /**
      * JWT 유효성 검증 및 인증 설정

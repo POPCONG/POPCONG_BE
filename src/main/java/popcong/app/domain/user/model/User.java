@@ -14,4 +14,26 @@ public record User (
     UserRole userRole, // guest-host
     LocalDateTime createdAt,
     LocalDateTime deletedAt
-) {}
+) {
+    public User updateProfile(
+            String name,
+            String introduction,
+            String profileImageUrl,
+            UserRole userRole,
+            LocalDateTime createdAt
+    ) {
+        return new User(
+                this.id,
+                this.provider,
+                this.providerId,
+                this.email,
+                name,
+                profileImageUrl,
+                introduction,
+                this.role,
+                userRole,
+                createdAt,
+                this.deletedAt
+        );
+    }
+}

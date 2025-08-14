@@ -5,8 +5,8 @@ import org.springframework.stereotype.Repository;
 import popcong.app.adapter.out.persistence.user.Mapper.UserMapper;
 import popcong.app.adapter.out.persistence.user.entity.UserJpaEntity;
 import popcong.app.domain.user.model.User;
-import popcong.app.domain.user.port.out.LoadUserPort;
-import popcong.app.domain.user.port.out.SaveUserPort;
+import popcong.app.application.user.port.out.LoadUserPort;
+import popcong.app.application.user.port.out.SaveUserPort;
 
 import java.util.Optional;
 

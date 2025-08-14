@@ -1,7 +1,7 @@
 package popcong.app.adapter.out.oauth;
 
 import lombok.Getter;
-import popcong.app.domain.auth.port.out.OAuth2UserInfoPort;
+import popcong.app.application.auth.port.out.OAuth2UserInfoPort;
 import popcong.app.domain.user.model.Provider;
 import popcong.app.global.exception.custom.BusinessException;
 import popcong.app.global.exception.error.AuthErrorCode;

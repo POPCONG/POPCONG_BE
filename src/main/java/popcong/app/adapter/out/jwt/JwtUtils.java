@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import popcong.app.domain.auth.model.AuthInfo;
-import popcong.app.domain.auth.port.in.TokenGenerateUseCase;
+import popcong.app.application.auth.port.in.TokenGenerateUseCase;
 
 import javax.crypto.SecretKey;
 import java.util.Collections;
