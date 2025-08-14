@@ -1,4 +1,4 @@
-package popcong.app.domain.auth.port.out;
+package popcong.app.application.auth.port.out;
 
 import popcong.app.domain.user.model.Provider;
 
