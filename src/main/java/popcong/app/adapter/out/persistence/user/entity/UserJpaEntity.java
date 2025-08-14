@@ -21,7 +21,7 @@ public class UserJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "usertId", nullable = false)
+    @Column(name = "userId", nullable = false)
     private Long userId;
 
     @Enumerated(EnumType.STRING)
