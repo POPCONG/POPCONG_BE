@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @SpringBootTest
-@Transactional
 @ActiveProfiles("local")
 public class AuthTest {
 
