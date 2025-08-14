@@ -24,6 +24,12 @@ public class UserAdapter implements LoadUserPort, SaveUserPort {
     }
 
     @Override
+    public Optional<User> loadUserById(Long id) {
+        return userJpaRepository.findById(id)
+                .map(userMapper::toDomain);
+    }
+
+    @Override
     public User saveUser(User user) {
         UserJpaEntity entity = userJpaRepository.save(userMapper.toEntity(user));
         return userMapper.toDomain(entity);

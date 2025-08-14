@@ -8,11 +8,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import popcong.app.application.user.port.out.LoadUserPort;
 import popcong.app.domain.auth.model.AuthInfo;
 import popcong.app.application.auth.port.in.TokenGenerateUseCase;
 
 import javax.crypto.SecretKey;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -21,15 +23,17 @@ public class JwtUtils {
     private final SecretKey secretKey;
     public final TokenGenerateUseCase accessTokenGenerateService;
     public final TokenGenerateUseCase refreshTokenGenerateService;
+    private final LoadUserPort loadUserPort;
 
     public JwtUtils(
             SecretKey secretKey,
             @Qualifier("accessTokenGenerateService") TokenGenerateUseCase accessTokenGenerateService,
-            @Qualifier("refreshTokenGenerateService")  TokenGenerateUseCase refreshTokenGenerateService
+            @Qualifier("refreshTokenGenerateService")  TokenGenerateUseCase refreshTokenGenerateService, LoadUserPort loadUserPort
     ) {
         this.secretKey = secretKey;
         this.accessTokenGenerateService = accessTokenGenerateService;
         this.refreshTokenGenerateService = refreshTokenGenerateService;
+        this.loadUserPort = loadUserPort;
     }
 
     // Access Tokne 생성
@@ -75,6 +79,19 @@ public class JwtUtils {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
+    }
+
+    // jwt로 사용자 추출
+    public Authentication authentication(String accessToken) {
+        Claims claims = getClaimsFromToken(accessToken);
+        Long userId = Long.valueOf(claims.getSubject());
+        String role = claims.get("role", String.class);
+        var authorities = List.of(new SimpleGrantedAuthority(role != null ? role : "ROLE_USER"));
+
+        popcong.app.domain.user.model.User user = loadUserPort.loadUserById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. : " + userId));
+
+        return new UsernamePasswordAuthenticationToken(user, accessToken, authorities);
     }
 
     // Access Token에서 인증 정보 추출
