@@ -49,7 +49,7 @@ public class AuthTest {
         );
 
         User saved = saveUserPort.saveUser(user);
-        log.info("테스트 사용자 생성: id={}, email={}", saved.id(), saved.email());
+        log.info("테스트 사용자 생성: id={}, email={}", saved.userId(), saved.email());
 
         AuthInfo authInfo = AuthInfo.from(saved);
         String accessToken = jwtUtils.generateAccessToken(authInfo);

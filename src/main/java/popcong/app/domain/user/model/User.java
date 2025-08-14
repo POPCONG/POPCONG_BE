@@ -3,7 +3,7 @@ package popcong.app.domain.user.model;
 import java.time.LocalDateTime;
 
 public record User (
-    Long id,
+    Long userId,
     Provider provider, // 소셜로그인 제공자
     String providerId, // 소셜로그인에서 제공받은 ID
     String email, // 소셜로그인 email
@@ -23,7 +23,7 @@ public record User (
             LocalDateTime createdAt
     ) {
         return new User(
-                this.id,
+                this.userId,
                 this.provider,
                 this.providerId,
                 this.email,

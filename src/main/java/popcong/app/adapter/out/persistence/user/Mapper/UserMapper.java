@@ -10,7 +10,7 @@ public class UserMapper {
     // Entity -> Domain
     public User toDomain(UserJpaEntity entity) {
         return new User(
-                entity.getId(),
+                entity.getUserId(),
                 entity.getProvider(),
                 entity.getProviderId(),
                 entity.getEmail(),
@@ -27,7 +27,7 @@ public class UserMapper {
     // Domain -> Entity
     public UserJpaEntity toEntity(User domain) {
         return UserJpaEntity.builder()
-                .id(domain.id())
+                .userId(domain.userId())
                 .provider(domain.provider())
                 .providerId(domain.providerId())
                 .email(domain.email())

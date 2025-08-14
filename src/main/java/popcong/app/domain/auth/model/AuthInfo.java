@@ -10,7 +10,7 @@ public record AuthInfo(
 ) {
     public static AuthInfo from(User user) {
         return new AuthInfo(
-                user.id(),
+                user.userId(),
                 user.email(),
                 user.role()
         );
