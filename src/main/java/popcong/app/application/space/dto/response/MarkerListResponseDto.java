@@ -1,4 +1,4 @@
-package popcong.app.application.space.response;
+package popcong.app.application.space.dto.response;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package popcong.app.application.space.request;
+package popcong.app.application.space.dto.request;
 
 public record CurrentUserLocationRequestDto(
         Double latitude,
