@@ -4,6 +4,7 @@ import popcong.app.domain.space.model.Space;
 import popcong.app.domain.space.model.SpaceSortType;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SpaceMapQueryUseCase {
     List<Space> getSpaceMarkersInDisplayWithFilters(
@@ -17,4 +18,6 @@ public interface SpaceMapQueryUseCase {
             Double rating,
             SpaceSortType sortType
     );
+
+    Map<Long, Long> getReviewCountsFor(List<Space> spaces);
 }

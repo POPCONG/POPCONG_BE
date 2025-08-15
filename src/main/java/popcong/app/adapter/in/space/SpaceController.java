@@ -16,6 +16,7 @@ import popcong.app.global.exception.custom.BusinessException;
 import popcong.app.global.exception.error.SpaceErrorCode;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -39,17 +40,28 @@ public class SpaceController {
             @RequestParam(name = "rating", required = false) Double rating,
             @RequestParam(name = "sort", defaultValue = "MOST_POPULAR") SpaceSortType sort
     ){
+        if (request == null) {
+            throw new BusinessException(SpaceErrorCode.USER_LOCATION_REQUIRED);
+        }
+
         if (minAmount != null && maxAmount != null && minAmount > maxAmount) {
             throw new BusinessException(SpaceErrorCode.INVALID_PRICE_ERROR);
         }
+
+        Double userLat = (request != null) ? request.latitude()  : null;
+        Double userLng = (request != null) ? request.longitude() : null;
 
         List<Space> spaces = spaceMapQueryUseCase.getSpaceMarkersInDisplayWithFilters(
                 nwLat, nwLng, seLat, seLng,
                 minAmount, maxAmount, floor, rating, sort
         );
 
+        Map<Long, Long> reviewCounts = spaceMapQueryUseCase.getReviewCountsFor(spaces);
+
         List<MarkerComponentDto> markers = spaces.stream()
-                .map(spaceMarkerMapper::toMarkerDto)
+                .map(space -> spaceMarkerMapper.toMarkerDto(
+                        space, userLat, userLng, reviewCounts.getOrDefault(space.spaceId(), 0L).intValue()
+                ))
                 .toList();
 
         MarkerListResponseDto result = new MarkerListResponseDto(markers);

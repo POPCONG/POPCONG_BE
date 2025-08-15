@@ -11,6 +11,6 @@ public record MarkerComponentDto(
         Integer floor, // 층수
         Double rating, // 공간 평점
         Integer reviewCount, // 공간 후기 수
-        Double distance // 현위치와의 거리
+        Long distance // 현위치와의 거리
 ) {
 }

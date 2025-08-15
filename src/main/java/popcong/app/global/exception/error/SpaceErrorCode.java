@@ -14,7 +14,8 @@ public enum SpaceErrorCode implements ErrorCode {
     // 400
     INVALID_PRICE_ERROR(HttpStatus.BAD_REQUEST.value(), "S4001", "금액 범위가 잘못되었습니다."),
     UNSUPPORTED_SORT_TYPE(HttpStatus.BAD_REQUEST.value(), "S4002", "지원하지 않는 정렬 타입입니다."),
-    INVALID_BOUDING_BOX(HttpStatus.BAD_REQUEST.value(), "S4003", "탐색 범위가 잘못됐습니다."),;
+    INVALID_BOUDING_BOX(HttpStatus.BAD_REQUEST.value(), "S4003", "탐색 범위가 잘못됐습니다."),
+    USER_LOCATION_REQUIRED(HttpStatus.BAD_REQUEST.value(), "S4004", "사용자의 현재 위치 정보가 필요합니다.");
 
     private final int httpStatus;
     private final String code;
