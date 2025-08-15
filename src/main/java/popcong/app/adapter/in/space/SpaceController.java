@@ -6,17 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import popcong.app.adapter.out.persistence.space.mapper.SpaceMarkerMapper;
 import popcong.app.application.space.dto.request.CurrentUserLocationRequestDto;
-import popcong.app.application.space.dto.response.MarkerComponentDto;
 import popcong.app.application.space.dto.response.MarkerListResponseDto;
 import popcong.app.application.space.port.in.SpaceMapQueryUseCase;
-import popcong.app.domain.space.model.Space;
 import popcong.app.domain.space.model.SpaceSortType;
 import popcong.app.global.dto.ResponseDto;
 import popcong.app.global.exception.custom.BusinessException;
 import popcong.app.global.exception.error.SpaceErrorCode;
 
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -51,18 +47,11 @@ public class SpaceController {
         Double userLat = (request != null) ? request.latitude()  : null;
         Double userLng = (request != null) ? request.longitude() : null;
 
-        List<Space> spaces = spaceMapQueryUseCase.getSpaceMarkersInDisplayWithFilters(
+        var markers = spaceMapQueryUseCase.getMarkerInDisplayWithFilters(
+                userLat, userLng,
                 nwLat, nwLng, seLat, seLng,
                 minAmount, maxAmount, floor, rating, sort
         );
-
-        Map<Long, Long> reviewCounts = spaceMapQueryUseCase.getReviewCountsFor(spaces);
-
-        List<MarkerComponentDto> markers = spaces.stream()
-                .map(space -> spaceMarkerMapper.toMarkerDto(
-                        space, userLat, userLng, reviewCounts.getOrDefault(space.spaceId(), 0L).intValue()
-                ))
-                .toList();
 
         MarkerListResponseDto result = new MarkerListResponseDto(markers);
 

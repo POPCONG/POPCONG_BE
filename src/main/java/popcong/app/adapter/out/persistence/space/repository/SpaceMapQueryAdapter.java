@@ -50,14 +50,14 @@ public class SpaceMapQueryAdapter implements SpaceMapQueryPort {
         double maxLng = Math.max(nwLng, seLng);
 
         QSpaceJpaEntity s = QSpaceJpaEntity.spaceJpaEntity;
-        QReservationJpaEntity r = QReservationJpaEntity.reservationJpaEntity;
-        QReservationReviewJpaEntity rr = QReservationReviewJpaEntity.reservationReviewJpaEntity;
+//        QReservationJpaEntity r = QReservationJpaEntity.reservationJpaEntity;
+//        QReservationReviewJpaEntity rr = QReservationReviewJpaEntity.reservationReviewJpaEntity;
 
         BooleanExpression inBox = s.latitude.between(minLat, maxLat).and(s.longitude.between(minLng, maxLng));
         BooleanExpression feeMin = (minAmount != null) ? s.rentalFee.goe(minAmount) : null;
         BooleanExpression feeMax = (maxAmount != null) ? s.rentalFee.loe(maxAmount) : null;
         BooleanExpression floorEq = (floor != null) ? s.floor.eq(floor) : null;
-        BooleanExpression ratingGe = (rating != null) ? s.rating.goe(rating) : null;
+        BooleanExpression ratingG = (rating != null) ? s.rating.goe(rating) : null;
 
         if (sortType == null) {
             sortType = SpaceSortType.MOST_POPULAR;
@@ -65,21 +65,13 @@ public class SpaceMapQueryAdapter implements SpaceMapQueryPort {
 
         List<SpaceJpaEntity> entities = switch (sortType) {
             case MOST_POPULAR -> jpaQueryFactory.selectFrom(s)
-                    .where(inBox, feeMin, feeMax, floorEq, ratingGe)
+                    .where(inBox, feeMin, feeMax, floorEq, ratingG)
                     .orderBy(s.views.desc(), s.spaceId.asc())
                     .fetch();
-
-            case NEAREST -> jpaQueryFactory.selectFrom(s)
-                    .where(inBox, feeMin, feeMax, floorEq, ratingGe)
-                    .orderBy(s.spaceId.asc()) // id 순으로 진행 (임시)
-                    .fetch();
-
-            case MOST_REVIEWS -> jpaQueryFactory.selectFrom(s)
-                    .leftJoin(r).on(r.space.eq(s))
-                    .leftJoin(rr).on(rr.reservation.eq(r))
-                    .where(inBox, feeMin, feeMax, floorEq, ratingGe)
-                    .groupBy(s.spaceId)
-                    .orderBy(rr.reservationReviewId.count().desc(), s.spaceId.asc())
+            case NEAREST, MOST_REVIEWS -> jpaQueryFactory
+                    .selectFrom(s)
+                    .where(inBox, feeMin, feeMax, floorEq, ratingG)
+                    .orderBy(s.spaceId.asc())
                     .fetch();
         };
 
