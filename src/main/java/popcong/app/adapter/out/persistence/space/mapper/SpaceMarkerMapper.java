@@ -2,7 +2,7 @@ package popcong.app.adapter.out.persistence.space.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import popcong.app.application.image.service.ImageQueryService;
+import popcong.app.application.image.port.in.ImageQueryUseCase;
 import popcong.app.application.space.dto.response.MarkerComponentDto;
 import popcong.app.domain.image.model.ImageableType;
 import popcong.app.domain.space.model.Space;
@@ -11,7 +11,7 @@ import popcong.app.domain.space.model.Space;
 @RequiredArgsConstructor
 public class SpaceMarkerMapper {
 
-    private final ImageQueryService imageQueryService;
+    private final ImageQueryUseCase imageQueryService;
 
     public MarkerComponentDto toMarkerDto(Space space) {
 

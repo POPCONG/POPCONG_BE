@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import popcong.app.adapter.out.persistence.image.mapper.CoverImageMapper;
 import popcong.app.adapter.out.persistence.image.repository.ImageJpaRepository;
+import popcong.app.application.image.port.in.ImageQueryUseCase;
 import popcong.app.domain.image.model.ImageableType;
 
 @Service
 @RequiredArgsConstructor
-public class ImageQueryService {
+public class ImageQueryService implements ImageQueryUseCase {
 
     private final ImageJpaRepository imageJpaRepository;
     private final CoverImageMapper coverImageMapper;
