@@ -25,16 +25,14 @@ public class HomeController {
 
     @GetMapping("/me")
     public ResponseDto<HomeUserResponseDto> getHomeInfo(
-            @AuthenticationPrincipal User user,
-            @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(defaultValue = "0") int offset
+            @AuthenticationPrincipal User user
     ) {
         if (user == null) {
             throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
         }
 
         HomeUserResponseDto result =
-                getHomeInfoUseCase.getMyHomeInfo(user.userId(), limit, offset);
+                getHomeInfoUseCase.getMyHomeInfo(user.userId());
 
         log.info("홈 정보 조회 성공 : userId={}", user.userId());
 

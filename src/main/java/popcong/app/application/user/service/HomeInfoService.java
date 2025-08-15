@@ -25,14 +25,14 @@ public class HomeInfoService implements GetHomeInfoUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public HomeUserResponseDto getMyHomeInfo(Long userId, int limit, int offset) {
+    public HomeUserResponseDto getMyHomeInfo(Long userId) {
         // 사용자 조회 (없으면 예외)
         User user = loadUserPort.loadUserById(userId)
                 .orElseThrow(() -> new BusinessException(AuthErrorCode.UNAUTHORIZED));
 
         // 내 팝업 조회
         List<MyPopupItemResponseDto> myPopups =
-                loadMyPopupsPort.findMyPopups(userId, limit, offset);
+                loadMyPopupsPort.findMyPopups(userId);
 
         // 응답 DTO 조합
         return HomeUserResponseDto.from(UserResponseDto.from(user), myPopups);
