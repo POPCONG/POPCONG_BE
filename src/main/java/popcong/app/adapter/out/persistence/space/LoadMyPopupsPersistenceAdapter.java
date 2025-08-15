@@ -22,7 +22,7 @@ public class LoadMyPopupsPersistenceAdapter implements LoadMyPopupsPort {
     public List<MyPopupItemResponseDto> findMyPopups(Long userId) {
 
         List<PopupJpaEntity> rows =
-                popupJpaRepository.findByReservationUserUserIdOrderByStartDateDesc(userId);
+                popupJpaRepository.findByReservationUserUserIdOrderByStartDateAsc(userId);
 
         return rows.stream()
                 .map(PopupEntityMapper::toMyPopupItemResponseDto)
