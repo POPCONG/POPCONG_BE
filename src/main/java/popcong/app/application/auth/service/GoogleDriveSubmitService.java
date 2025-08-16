@@ -6,32 +6,35 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import popcong.app.application.auth.port.in.GoogleDriveSubmitUseCase;
 import popcong.app.domain.user.model.SignUpUserType;
+import popcong.app.domain.user.model.UploadItem;
 import popcong.app.infra.config.gcp.GcpApiProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class GoogleDriveSubmitService implements GoogleDriveSubmitUseCase {
 
-    private Drive drive;
-    private GcpApiProperties gcpApiProperties;
+    private final Drive drive;
+    private final GcpApiProperties gcpApiProperties;
 
     @Override
-    public String submitUserDocs(
+    public List<String> submitUserDocs(
             SignUpUserType userType, // GUEST, HOST
             Long userId,
             String email,
-            String filename,
-            InputStream content,
-            String fileFormatType // nullable
+            List<UploadItem> items
     ) {
         try {
             // drive id, name 가져오기
@@ -40,16 +43,36 @@ public class GoogleDriveSubmitService implements GoogleDriveSubmitUseCase {
             // drive 이름 생성
             String userDriveName = userId + "_" + sanitize(email);
 
-            String userDriveId = setUserDriveUnderRoot(rootDriveId, userDriveName);
+            // 드라이브 보장
+            String userFolderId = setUserDriveUnderRoot(rootDriveId, userDriveName);
 
-            return uploadFile(userDriveId, filename, content, safeMime(fileFormatType));
+            List<String> ids = new ArrayList<>();
+            for (UploadItem item : items) {
+                MultipartFile multipartFile = item.file();
+
+                // 파일명에 타입 추가
+                String prefixedName = item.type().name().toLowerCase() + "_" + multipartFile.getOriginalFilename();
+
+                try (InputStream inputStream = multipartFile.getInputStream()) {
+
+                    String id = uploadFile(
+                            userFolderId,
+                            prefixedName,
+                            inputStream,
+                            safeMime(multipartFile.getContentType())
+                    );
+                    ids.add(id);
+                }
+            }
+
+            return ids;
         } catch (IOException e) {
             throw new RuntimeException("Google Drive 업로드 실패", e);
         }
     }
 
 
-    // 유저 타입에 따라 다른 Google Drive ID 가져오기
+    // 유저 타입에 따라 다른 Google Drive ID 가져오기 (폴더 보장)
     private String getDriveId(SignUpUserType userType) {
         return (Objects.equals(userType, SignUpUserType.GUEST))
                 ? gcpApiProperties.getGuestDriveId() : gcpApiProperties.getHostDriveId();
@@ -91,20 +114,20 @@ public class GoogleDriveSubmitService implements GoogleDriveSubmitUseCase {
 
     // 파일 업로드
     private String uploadFile(
-            String parentDriveId,
+            String parentFolderId,
             String fileName,
             InputStream content,
             String fileFormatType
     ) throws IOException {
         File file = new File();
         file.setName(fileName);
-        file.setParents(List.of(parentDriveId));
+        file.setParents(List.of(parentFolderId));
 
         var media = new InputStreamContent(fileFormatType, content);
 
         File created = drive.files().create(file, media)
                 .setSupportsAllDrives(true)
-                .setFields("id")
+                .setFields("id, parents")
                 .execute();
 
         return created.getId();

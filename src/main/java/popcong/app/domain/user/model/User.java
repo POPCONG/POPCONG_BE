@@ -15,24 +15,18 @@ public record User (
     LocalDateTime createdAt,
     LocalDateTime deletedAt
 ) {
-    public User updateProfile(
-            String name,
-            String introduction,
-            String profileImageUrl,
-            UserRole userRole,
-            LocalDateTime createdAt
-    ) {
+    public User withUserRole(UserRole userRole) {
         return new User(
                 this.userId,
                 this.provider,
                 this.providerId,
                 this.email,
-                name,
-                profileImageUrl,
-                introduction,
+                this.name,
+                this.profileImageUrl,
+                this.introduction,
                 this.role,
                 userRole,
-                createdAt,
+                this.createdAt,
                 this.deletedAt
         );
     }

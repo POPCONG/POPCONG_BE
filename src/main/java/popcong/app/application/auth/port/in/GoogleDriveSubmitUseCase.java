@@ -1,17 +1,15 @@
 package popcong.app.application.auth.port.in;
 
 import popcong.app.domain.user.model.SignUpUserType;
-import popcong.app.domain.user.model.UserRole;
+import popcong.app.domain.user.model.UploadItem;
 
-import java.io.InputStream;
+import java.util.List;
 
 public interface GoogleDriveSubmitUseCase {
-    String submitUserDocs(
+    List<String> submitUserDocs(
             SignUpUserType userRole,
             Long userId,
             String email,
-            String filename,
-            InputStream content,
-            String fileFormatType
+            List<UploadItem> items
     );
 }
