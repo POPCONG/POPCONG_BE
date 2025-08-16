@@ -10,3 +10,10 @@ spring:
         format_sql: true
         show_sql: true
     open-in-view: false
+
+cloud:
+  aws:
+    profile: dev
+    region: us-east-2     # 버킷 리전
+    s3:
+      bucket: popcongbucket
