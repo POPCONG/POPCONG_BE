@@ -1,7 +1,5 @@
 package popcong.app.domain.space.model;
 
-import java.time.LocalDateTime;
-
 public record Space(
         Long spaceId,
         Long userId,
@@ -21,7 +19,6 @@ public record Space(
         Double latitude,
         Double longitude,
         Status status,
-        Integer views,
-        LocalDateTime createdAt
+        Integer views
 ) {
 }
