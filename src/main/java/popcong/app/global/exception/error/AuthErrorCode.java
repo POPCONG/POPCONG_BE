@@ -19,7 +19,10 @@ public enum AuthErrorCode implements ErrorCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED.value(),"A4011", "인증되지 않은 사용자압니다."),
 
     // 403
-    ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "A4031", "접근 권한이 없습니다.");
+    ACCESS_DENIED(HttpStatus.FORBIDDEN.value(), "A4031", "접근 권한이 없습니다."),
+
+    // 404
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "A4041", "사용자를 찾을 수 없습니다."),;
 
     private final int httpStatus;
     private final String code;
