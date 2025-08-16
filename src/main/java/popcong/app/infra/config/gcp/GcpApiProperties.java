@@ -14,4 +14,7 @@ public class GcpApiProperties {
 
     private String hostDriveId;
     private String guestDriveId;
+
+    private String hostRootDriveName;
+    private String guestRootDriveName;
 }
