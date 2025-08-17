@@ -23,17 +23,13 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
       - uses: aws-actions/amazon-ecr-login@v2
-
       - uses: docker/setup-buildx-action@v3
-
       - uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
@@ -55,67 +51,48 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY_PEM }}
+          key: ${{ secrets.EC2_SSH_KEY_PEM }}   # PEM 원문 비밀
           port: 22
           timeout: 30s
           command_timeout: 10m
           script: |
             set -euo pipefail
             
-            # 환경변수 설정
+            # 디렉토리 준비
+            mkdir -p ~/popcong/config ~/popcong/secrets
+            
+            echo "[주입] application-prod.yml"
+            cat > ~/popcong/config/application-prod.yml <<'EOF_APP_PROD'
+            ${{ secrets.APP_PROD_YML }}
+            EOF_APP_PROD
+            echo "[주입] application-secret.yml"
+            cat > ~/popcong/config/application-secret.yml <<'EOF_APP_SECRET'
+            ${{ secrets.APP_SECRET_YML }}
+            EOF_APP_SECRET
+            
+            echo "[주입] GCP JSON (base64 -> file)"
+            echo "${{ secrets.GCP_CRED_B64 }}" | base64 -d > ~/popcong/secrets/popcong-c9addd5f509d.json
+            
+            # 권한(컨테이너가 읽기만)
+            chmod 640 ~/popcong/config/application-*.yml
+            chmod 640 ~/popcong/secrets/popcong-c9addd5f509d.json
+            
+            # (선택) 코드에서 아직 ClassPathResource 로 JSON을 읽는다면, 아래 한 줄로 classpath에도 마운트되도록 링크
+            # ln -sf ~/popcong/secrets/popcong-c9addd5f509d.json ~/popcong/popcong-c9addd5f509d.json || true
+            
+            # ECR 로그인
             AWS_REGION="${{ env.AWS_REGION }}"
             ACCOUNT_ID="${{ env.ACCOUNT_ID }}"
             REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-            
-            echo "========================================"
-            echo "배포 시작: $(date)"
-            echo "========================================"
-
-            echo "[Step 1] ECR 로그인"
             aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
             
-            if [ $? -eq 0 ]; then
-                echo "✓ ECR 로그인 성공"
-            else
-                echo "✗ ECR 로그인 실패"
-                exit 1
-            fi
-
-            echo "[Step 2] 디렉토리 이동"
             cd ~/popcong
             
-            if [ ! -f "docker-compose.yml" ]; then
-                echo "✗ docker-compose.yml 파일을 찾을 수 없습니다"
-                exit 1
-            fi
-
-            echo "[Step 3] 기존 컨테이너 정리"
-            docker compose down --remove-orphans || true
-
-            echo "[Step 4] 최신 이미지 Pull"
+            echo "[이미지 Pull]"
             docker compose pull
             
-            if [ $? -eq 0 ]; then
-                echo "✓ 이미지 Pull 성공"
-            else
-                echo "✗ 이미지 Pull 실패"
-                exit 1
-            fi
-
-            echo "[Step 5] 컨테이너 시작"
+            echo "[재기동]"
             docker compose up -d --remove-orphans
             
-            if [ $? -eq 0 ]; then
-                echo "✓ 컨테이너 시작 성공"
-            else
-                echo "✗ 컨테이너 시작 실패"
-                exit 1
-            fi
-
-            echo "[Step 6] 상태 확인"
-            sleep 5
+            echo "[상태 확인]"
             docker compose ps
-            
-            echo "========================================"
-            echo "배포 완료: $(date)"
-            echo "========================================"
