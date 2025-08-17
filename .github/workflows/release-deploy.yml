@@ -23,13 +23,17 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
       - uses: aws-actions/amazon-ecr-login@v2
+
       - uses: docker/setup-buildx-action@v3
+
       - uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
@@ -57,25 +61,6 @@ jobs:
             AWS_REGION="${{ env.AWS_REGION }}"
             ACCOUNT_ID="${{ env.ACCOUNT_ID }}"
             REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-            aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
-            cd ~/popcong
-            docker compose pull
-            docker compose up -d --remove-orphans
-            docker compose ps
-
-      - name: EC2에 접속해 배포 실행
-        shell: bash
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          ACCOUNT_ID: ${{ env.ACCOUNT_ID }}
-          ECR_REPO: ${{ env.ECR_REPOSITORY }}
-        run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOSSH'
-            set -euo pipefail
-            AWS_REGION="${AWS_REGION}"
-            ACCOUNT_ID="${ACCOUNT_ID}"
-            REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-            REPO="${ECR_REPO}"
 
             echo "[EC2] ECR 로그인"
             aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
@@ -91,5 +76,3 @@ jobs:
 
             echo "[EC2] 상태 확인"
             docker compose ps
-            docker ps
-          EOSSH
