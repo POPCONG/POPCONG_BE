@@ -8,7 +8,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import popcong.app.application.auth.port.in.GoogleDriveSubmitUseCase;
+import popcong.app.application.user.dto.response.MyProfileResponseDto;
 import popcong.app.application.user.dto.response.UserResponseDto;
+import popcong.app.application.user.port.in.GetMyProfileUseCase;
 import popcong.app.application.user.port.in.UserInfoUseCase;
 import popcong.app.domain.user.model.DocumentType;
 import popcong.app.domain.user.model.SignUpUserType;
@@ -30,6 +32,7 @@ public class UserController {
 
     private final GoogleDriveSubmitUseCase googleDriveSubmitUseCase;
     private final UserInfoUseCase userInfoUseCase;
+    private final GetMyProfileUseCase getMyProfileUseCase;
 
 
     /**
@@ -121,8 +124,7 @@ public class UserController {
                 null
         );
     }
-
-
+    //사용자 조회
     @GetMapping("/me")
     public ResponseDto<UserResponseDto> getUserInfo(@AuthenticationPrincipal User user) {
         if (user == null) {
@@ -139,19 +141,19 @@ public class UserController {
                 result
         );
     }
+    // 내 프로필 조회
     @GetMapping("/mypage/me")
-    public ResponseDto<UserResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
-        if (user == null) {
-            throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
-        }
-        log.info("내 프로필 조회 성공 : userId = {}, email = {}", user.userId(), user.email());
+    public ResponseDto<MyProfileResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
+        if (user == null) throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
 
-        UserResponseDto result = UserResponseDto.from(user);
+        // ✅ 타입명이 아니라, 주입받은 인스턴스로 호출
+        MyProfileResponseDto dto = getMyProfileUseCase.get(user.userId());
 
         return new ResponseDto<>(
                 HttpStatus.OK.value(),
-                "나의 프로필 조회 성공",
-                result
+                "내 프로필 조회 성공",
+                dto
         );
     }
 }
+

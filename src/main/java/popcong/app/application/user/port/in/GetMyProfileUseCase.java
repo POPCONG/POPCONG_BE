@@ -1,7 +1,7 @@
 package popcong.app.application.user.port.in;
 
-import popcong.app.domain.user.model.User;
+import popcong.app.application.user.dto.response.MyProfileResponseDto;
 
 public interface GetMyProfileUseCase {
-    User getMyProfile(Long userId);
+    MyProfileResponseDto get(Long userId);
 }
