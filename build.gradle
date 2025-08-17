@@ -72,6 +72,11 @@ dependencies {
 	// Validation
 	implementation 'jakarta.validation:jakarta.validation-api:3.1.0'
 
+	//AWS
+	implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.700')
+	implementation 'com.amazonaws:aws-java-sdk-s3'   // S3
+	implementation 'com.amazonaws:aws-java-sdk-sts'
+
 	// GCP (Google Drive)
 	implementation 'com.google.guava:guava:32.1.0-jre'
 	implementation 'com.google.http-client:google-http-client:1.41.8'
