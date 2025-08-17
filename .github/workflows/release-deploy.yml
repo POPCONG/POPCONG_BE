@@ -9,7 +9,6 @@ env:
   AWS_REGION: us-west-2
   ACCOUNT_ID: "590184104064"
   ECR_REPOSITORY: popcong-server
-  IMAGE_TAG: ${{ github.sha }}
 
 concurrency:
   group: release-deploy
@@ -17,17 +16,15 @@ concurrency:
 
 jobs:
   build-and-push:
+    if: github.ref == 'refs/heads/release'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
 
-    env:
-      AWS_REGION: ${{ env.AWS_REGION }}
-      ACCOUNT_ID: ${{ env.ACCOUNT_ID }}
-      ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-      IMAGE_TAG: ${{ env.IMAGE_TAG }}
-      REGISTRY: ${{ format('{0}.dkr.ecr.{1}.amazonaws.com', env.ACCOUNT_ID, env.AWS_REGION) }}
+    outputs:
+      registry: ${{ steps.meta.outputs.registry }}
+      image_tag: ${{ steps.meta.outputs.image_tag }}
 
     steps:
       - name: Checkout
@@ -39,6 +36,14 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Compute dynamic env (REGISTRY, IMAGE_TAG)
+        id: meta
+        run: |
+          echo "REGISTRY=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=${GITHUB_SHA}" >> "$GITHUB_ENV"
+          echo "registry=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
@@ -58,15 +63,10 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
   deploy:
+    if: github.ref == 'refs/heads/release'
     needs: build-and-push
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
-    env:
-      AWS_REGION: ${{ env.AWS_REGION }}
-      ACCOUNT_ID: ${{ env.ACCOUNT_ID }}
-      ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-      REGISTRY: ${{ format('{0}.dkr.ecr.{1}.amazonaws.com', env.ACCOUNT_ID, env.AWS_REGION) }}
 
     steps:
       - name: Connect & Deploy on EC2
@@ -77,6 +77,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -euo pipefail
+            AWS_REGION="${{ env.AWS_REGION }}"
+            ACCOUNT_ID="${{ env.ACCOUNT_ID }}"
+            REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
             echo "[EC2] ECR 로그인"
             aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
