@@ -139,4 +139,19 @@ public class UserController {
                 result
         );
     }
+    @GetMapping("/mypage/me")
+    public ResponseDto<UserResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
+        }
+        log.info("내 프로필 조회 성공 : userId = {}, email = {}", user.userId(), user.email());
+
+        UserResponseDto result = UserResponseDto.from(user);
+
+        return new ResponseDto<>(
+                HttpStatus.OK.value(),
+                "나의 프로필 조회 성공",
+                result
+        );
+    }
 }
