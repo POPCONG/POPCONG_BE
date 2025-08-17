@@ -46,11 +46,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: 복호화하여 SSH 키 파일 생성
-        shell: bash
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY_B64 }}" | base64 -d > key.pem
-          chmod 600 key.pem
+      - name: Connect & Deploy on EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY_PEM }}
+          script: |
+            set -euo pipefail
+            AWS_REGION="${{ env.AWS_REGION }}"
+            ACCOUNT_ID="${{ env.ACCOUNT_ID }}"
+            REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+            aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
+            cd ~/popcong
+            docker compose pull
+            docker compose up -d --remove-orphans
+            docker compose ps
 
       - name: EC2에 접속해 배포 실행
         shell: bash
