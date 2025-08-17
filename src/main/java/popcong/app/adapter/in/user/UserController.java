@@ -150,7 +150,7 @@ public class UserController {
     public ResponseDto<MyProfileResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
         if (user == null) throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
 
-        // ✅ 타입명이 아니라, 주입받은 인스턴스로 호출
+
         MyProfileResponseDto dto = getMyProfileUseCase.get(user.userId());
 
         return new ResponseDto<>(
