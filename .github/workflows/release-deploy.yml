@@ -21,65 +21,50 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
-    outputs:
-      registry: ${{ steps.meta.outputs.registry }}
-      image_tag: ${{ steps.meta.outputs.image_tag }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Compute dynamic env (REGISTRY, IMAGE_TAG)
-        id: meta
-        run: |
-          echo "REGISTRY=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com" >> "$GITHUB_ENV"
-          echo "IMAGE_TAG=${GITHUB_SHA}" >> "$GITHUB_ENV"
-          echo "registry=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com" >> "$GITHUB_OUTPUT"
-          echo "image_tag=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
-
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build & Push (linux/amd64)
-        uses: docker/build-push-action@v6
+      - uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
           push: true
           context: .
           file: ./Dockerfile
           tags: |
-            ${{ env.REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+            ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest
 
   deploy:
     if: github.ref == 'refs/heads/release'
     needs: build-and-push
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
-      - name: Connect & Deploy on EC2
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
+      - name: 복호화하여 SSH 키 파일 생성
+        shell: bash
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY_B64 }}" | base64 -d > key.pem
+          chmod 600 key.pem
+
+      - name: EC2에 접속해 배포 실행
+        shell: bash
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          ACCOUNT_ID: ${{ env.ACCOUNT_ID }}
+          ECR_REPO: ${{ env.ECR_REPOSITORY }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOSSH'
             set -euo pipefail
-            AWS_REGION="${{ env.AWS_REGION }}"
-            ACCOUNT_ID="${{ env.ACCOUNT_ID }}"
+            AWS_REGION="${AWS_REGION}"
+            ACCOUNT_ID="${ACCOUNT_ID}"
             REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+            REPO="${ECR_REPO}"
 
             echo "[EC2] ECR 로그인"
             aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
@@ -96,3 +81,4 @@ jobs:
             echo "[EC2] 상태 확인"
             docker compose ps
             docker ps
+          EOSSH
