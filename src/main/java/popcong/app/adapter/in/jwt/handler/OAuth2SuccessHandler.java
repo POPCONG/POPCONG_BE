@@ -21,7 +21,6 @@ import popcong.app.infra.config.cors.CorsProperties;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 //import static popcong.app.infra.config.security.SignInRedirectCaptureFilter.ALLOW_LIST;
@@ -39,10 +38,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private String frontendBaseUrl;
 
     @Value("${app.frontend.path.main}")
-    private String mainPath;
-
+    private String mainPath; // home
     @Value("${app.frontend.path.signup}")
-    private String signupPath;
+    private String signupPath; // signup
 
     @Value("${app.cookie.domain}")
     private String cookieDomain;
@@ -87,17 +85,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("accessToken: {}", accessToken);
         log.info("refreshToken: {}", refreshToken);
 
-        // 레거시 이름(예전 소문자) 먼저 제거
+        // 이름 모두 제거
         removeCookie(response, "access_token", "/");
         removeCookie(response, "refresh_token", "/");
-
-// 혹시 동일 이름이 다른 속성으로 남아있을 수 있으니 현행 이름도 한번 초기화
         removeCookie(response, accessCookieName, accessCookiePath);
         removeCookie(response, refreshCookieName, refreshCookiePath);
 
-// 현행 이름으로만 심기
+        // 현재 이름으로만 심기
         addCookie(response, accessCookieName, accessToken, accessCookiePath, accessCookieMaxAge);
         addCookie(response, refreshCookieName, refreshToken, refreshCookiePath, refreshCookieMaxAge);
+
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
 
         String desired = readCookie(request, "login_redirect")
                 .or(() -> Optional.ofNullable(request.getParameter("redirect_uri")))
