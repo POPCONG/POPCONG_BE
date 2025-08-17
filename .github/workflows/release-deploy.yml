@@ -7,9 +7,8 @@ on:
 
 env:
   AWS_REGION: us-west-2
-  ACCOUNT_ID: 590184104064
+  ACCOUNT_ID: "590184104064"
   ECR_REPOSITORY: popcong-server
-  REGISTRY: ${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
   IMAGE_TAG: ${{ github.sha }}
 
 concurrency:
@@ -22,6 +21,13 @@ jobs:
     permissions:
       id-token: write
       contents: read
+
+    env:
+      AWS_REGION: ${{ env.AWS_REGION }}
+      ACCOUNT_ID: ${{ env.ACCOUNT_ID }}
+      ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+      IMAGE_TAG: ${{ env.IMAGE_TAG }}
+      REGISTRY: ${{ format('{0}.dkr.ecr.{1}.amazonaws.com', env.ACCOUNT_ID, env.AWS_REGION) }}
 
     steps:
       - name: Checkout
@@ -56,6 +62,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
+    env:
+      AWS_REGION: ${{ env.AWS_REGION }}
+      ACCOUNT_ID: ${{ env.ACCOUNT_ID }}
+      ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+      REGISTRY: ${{ format('{0}.dkr.ecr.{1}.amazonaws.com', env.ACCOUNT_ID, env.AWS_REGION) }}
+
     steps:
       - name: Connect & Deploy on EC2
         uses: appleboy/ssh-action@v1.2.0
@@ -65,10 +77,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -euo pipefail
-
-            AWS_REGION="${{ env.AWS_REGION }}"
-            ACCOUNT_ID="${{ env.ACCOUNT_ID }}"
-            REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
             echo "[EC2] ECR 로그인"
             aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
