@@ -19,6 +19,7 @@ public record Space(
         Double latitude,
         Double longitude,
         String geoAdvantage,
+        Integer maxPeriod,
         Status status,
         Integer views
 ) {

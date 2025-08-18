@@ -9,6 +9,7 @@ public record ChatRoomInfoDto(
         Integer floor,
         Integer rentalFee,
         String coverImage,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Integer maxPeriod
 ) {
 }

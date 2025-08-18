@@ -85,6 +85,10 @@ public class SpaceJpaEntity {
     @Column(name = "geoAdvantage", nullable = true, length = 30)
     private String geoAdvantage;
 
+    @Column(name = "maxPeriod")
+    private Integer maxPeriod;
+
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

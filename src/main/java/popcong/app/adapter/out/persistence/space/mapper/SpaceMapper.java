@@ -7,7 +7,7 @@ import popcong.app.domain.space.model.Space;
 @Component
 public class SpaceMapper {
 
-    public Space toDomain(SpaceJpaEntity entity) {
+    public final Space toDomain(SpaceJpaEntity entity) {
         return new Space(
                 entity.getSpaceId(),
                 entity.getUser().getUserId(),
@@ -27,6 +27,7 @@ public class SpaceMapper {
                 entity.getLatitude(),
                 entity.getLongitude(),
                 entity.getGeoAdvantage(),
+                entity.getMaxPeriod(),
                 entity.getStatus(),
                 entity.getViews()
         );
