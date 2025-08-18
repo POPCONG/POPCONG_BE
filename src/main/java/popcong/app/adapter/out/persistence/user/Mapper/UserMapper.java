@@ -8,7 +8,7 @@ import popcong.app.domain.user.model.User;
 public class UserMapper {
 
     // Entity -> Domain
-    public User toDomain(UserJpaEntity entity) {
+    public final User toDomain(UserJpaEntity entity) {
         return new User(
                 entity.getUserId(),
                 entity.getProvider(),
