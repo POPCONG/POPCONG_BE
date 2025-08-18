@@ -14,6 +14,7 @@ public interface WishlistJpaRepository extends JpaRepository<WishlistJpaEntity, 
     // 파생 쿼리 (연관필드.식별자필드)
     boolean existsByUser_UserIdAndSpace_SpaceId(Long userId, Long spaceId);
     void deleteByUser_UserIdAndSpace_SpaceId(Long userId, Long spaceId);
+    List<WishlistJpaEntity> findByUser_UserIdAndSpace_SpaceIdIn(Long userId, Collection<Long> spaceIds);
 
     // WishQueryPort 구현
     @Override
@@ -36,9 +37,4 @@ public interface WishlistJpaRepository extends JpaRepository<WishlistJpaEntity, 
     default void delete(Long userId, Long spaceId) {
         deleteByUser_UserIdAndSpace_SpaceId(userId, spaceId);
     }
-  
-    boolean existsByUser_UserIdAndSpace_SpaceId(Long userId, Long spaceId);
-
-
-    List<WishlistJpaEntity> findByUser_UserIdAndSpace_SpaceIdIn(Long userId, Collection<Long> spaceIds);
 }
