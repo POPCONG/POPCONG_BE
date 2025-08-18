@@ -1,11 +1,10 @@
 package popcong.app.application.user.port.out;
 
+import java.util.Collection;
+import java.util.Set;
 
-import popcong.app.application.user.dto.response.MyWishItemDto;
+public interface WishlistQueryPort {
+    Set<Long> findWishedSpaceIds(Long userId, Collection<Long> spaceIds);
 
-import java.util.List;
-
-//userId 기준 관심목록 조회
-public interface WishListQueryPort {
-    List<MyWishItemDto> findMyWishlist(Long userId);
+    boolean existsByUserIdAndSpaceId(Long userId, Long spaceId);
 }
