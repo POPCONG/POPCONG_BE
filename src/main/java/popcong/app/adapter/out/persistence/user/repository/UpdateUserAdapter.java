@@ -1,11 +1,9 @@
-// popcong.app.adapter.out.user.UpdateUserAdapter
-package popcong.app.adapter.out.user;
+package popcong.app.adapter.out.persistence.user.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import popcong.app.adapter.out.persistence.user.entity.UserJpaEntity;
-import popcong.app.adapter.out.persistence.user.repository.UserJpaRepository;
 import popcong.app.application.user.port.out.UpdateUserPort;
 import popcong.app.global.exception.custom.BusinessException;
 import popcong.app.global.exception.error.AuthErrorCode;
