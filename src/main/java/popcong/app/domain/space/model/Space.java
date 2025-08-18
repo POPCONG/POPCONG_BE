@@ -18,6 +18,7 @@ public record Space(
         String location,
         Double latitude,
         Double longitude,
+        String geoAdvantage,
         Status status,
         Integer views
 ) {
