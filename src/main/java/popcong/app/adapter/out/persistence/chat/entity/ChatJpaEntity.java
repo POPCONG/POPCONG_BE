@@ -49,4 +49,21 @@ public class ChatJpaEntity {
 
     @Column(name = "hostLastReadAt")
     private LocalDateTime hostLastReadAt;
+
+    @Version
+    private Long version;
+    
+    public void updateGuestLastReadAt(LocalDateTime at) {
+        if (at == null) return;
+        if (this.guestLastReadAt == null || this.guestLastReadAt.isBefore(at)) {
+            this.guestLastReadAt = at;
+        }
+    }
+
+    public void updateHostLastReadAt(LocalDateTime at) {
+        if (at == null) return;
+        if (this.hostLastReadAt == null || this.hostLastReadAt.isBefore(at)) {
+            this.hostLastReadAt = at;
+        }
+    }
 }

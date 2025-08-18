@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import popcong.app.adapter.out.persistence.chat.entity.MessageJpaEntity;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface MessageJpaRepository extends JpaRepository<MessageJpaEntity, Long> {
 
@@ -15,4 +16,5 @@ public interface MessageJpaRepository extends JpaRepository<MessageJpaEntity, Lo
     // 안읽음 메시지 계산
     long countByChat_ChatIdAndSender_UserIdAndCreatedAtAfter(Long chatId, Long senderId, LocalDateTime createdAt);
 
+    Optional<MessageJpaEntity> findTopByChat_ChatIdOrderByCreatedAtDesc(Long chatId);
 }
