@@ -82,6 +82,9 @@ public class SpaceJpaEntity {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
+    @Column(name = "geoAdvantage", nullable = true, length = 30)
+    private String geoAdvantage;
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
