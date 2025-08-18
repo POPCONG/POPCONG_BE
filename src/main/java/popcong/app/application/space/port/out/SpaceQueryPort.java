@@ -5,6 +5,8 @@ import popcong.app.domain.space.model.Space;
 import java.util.List;
 
 public interface SpaceQueryPort {
+  
+    SpaceDetailDto findDetail(Long spaceId);
 
     List<Space> findPopularSpaceTop20();
 }
