@@ -1,5 +1,6 @@
 package popcong.app.application.space.port.out;
 
+import popcong.app.application.space.dto.response.SpaceDetailDto;
 import popcong.app.domain.space.model.Space;
 
 import java.util.List;

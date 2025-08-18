@@ -1,11 +1,10 @@
-package popcong.app.adapter.out.user;
+package popcong.app.adapter.out.persistence.user.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import popcong.app.adapter.out.persistence.space.entity.SpaceJpaEntity;
 import popcong.app.adapter.out.persistence.user.entity.UserJpaEntity;
 import popcong.app.adapter.out.persistence.user.entity.WishlistJpaEntity;
-import popcong.app.adapter.out.persistence.user.repository.WishlistJpaRepository;
 import popcong.app.application.user.port.out.WishCommandPort;
 
 import java.time.LocalDateTime;

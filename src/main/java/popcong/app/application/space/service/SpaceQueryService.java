@@ -11,7 +11,7 @@ import popcong.app.application.space.port.in.SpaceQueryUseCase;
 import popcong.app.application.space.port.out.PopupQueryPort;
 import popcong.app.application.space.port.out.ReviewCountQueryPort;
 import popcong.app.application.space.port.out.SpaceQueryPort;
-import popcong.app.application.user.port.out.WishlistQueryPort;
+import popcong.app.application.user.port.out.WishListQueryPort;
 import popcong.app.domain.image.model.Image;
 import popcong.app.domain.image.model.ImageableType;
 import popcong.app.domain.space.model.Space;
@@ -26,7 +26,7 @@ public class SpaceQueryService implements SpaceQueryUseCase {
 
     private final SpaceQueryPort spaceQueryPort;
     private final ImageQueryPort imageQueryPort;
-    private final WishlistQueryPort wishlistQueryPort;
+    private final WishListQueryPort wishlistQueryPort;
     private final ReviewCountQueryPort reviewCountQueryPort;
     private final PopupQueryPort popupQueryPort;
 

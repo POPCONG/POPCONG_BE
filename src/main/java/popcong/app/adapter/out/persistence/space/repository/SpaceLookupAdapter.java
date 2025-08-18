@@ -1,8 +1,7 @@
-package popcong.app.adapter.out.persistence.space;
+package popcong.app.adapter.out.persistence.space.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import popcong.app.adapter.out.persistence.space.repository.SpaceJpaRepository;
 import popcong.app.application.user.port.out.SpaceLookupPort;
 
 
