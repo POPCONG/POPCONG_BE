@@ -4,7 +4,6 @@ spring:
     
 cloud:
   aws:
-    profile: dev
     region: us-east-2
     s3:
       bucket: popcongbucket
