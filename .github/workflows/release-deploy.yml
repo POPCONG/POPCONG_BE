@@ -23,17 +23,13 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
       - uses: aws-actions/amazon-ecr-login@v2
-
       - uses: docker/setup-buildx-action@v3
-
       - uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
@@ -62,59 +58,127 @@ jobs:
           script: |
             set -euo pipefail
             
-            # 환경변수 설정
+            echo "========================================"
+            echo "배포 시작: $(date)"
+            echo "========================================"
+            
+            # 디렉토리 준비 (안전하게)
+            echo "[Step 1] 디렉토리 준비"
+            mkdir -p ~/popcong/config ~/popcong/secrets ~/popcong/keys
+            
+            # 기존 파일 백업 (선택사항)
+            if [ -f ~/popcong/config/application-prod.yml ]; then
+                cp ~/popcong/config/application-prod.yml ~/popcong/config/application-prod.yml.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+            if [ -f ~/popcong/config/application-secret.yml ]; then
+                cp ~/popcong/config/application-secret.yml ~/popcong/config/application-secret.yml.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+            if [ -f ~/popcong/secrets/popcong-c9addd5f509d.json ]; then
+                cp ~/popcong/secrets/popcong-c9addd5f509d.json ~/popcong/secrets/popcong-c9addd5f509d.json.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+            
+            # 설정 파일 주입 (더 안전한 방법)
+            echo "[Step 2] 설정 파일 생성"
+            
+            # application-prod.yml 생성
+            umask 077  # 생성되는 파일이 소유자만 읽기 가능하도록
+            cat > ~/popcong/config/application-prod.yml << 'EOF_APP_PROD'
+            ${{ secrets.APP_PROD_YML }}
+            EOF_APP_PROD
+            
+            # application-secret.yml 생성
+            cat > ~/popcong/config/application-secret.yml << 'EOF_APP_SECRET'
+            ${{ secrets.APP_SECRET_YML }}
+            EOF_APP_SECRET
+            
+            # GCP JSON 파일 생성 (Docker Compose에 맞는 경로로)
+            echo "[Step 3] GCP 인증 파일 생성"
+            if ! echo "${{ secrets.GCP_CRED_B64 }}" | base64 -d > ~/popcong/secrets/popcong-c9addd5f509d.json; then
+                echo "✗ GCP 인증 파일 디코딩 실패"
+                exit 1
+            fi
+            
+            # GCP 인증 파일을 keys 디렉토리에도 복사 (docker-compose.yml 볼륨 마운트용)
+            cp ~/popcong/secrets/popcong-c9addd5f509d.json ~/popcong/keys/popcong-c9addd5f509d.json || {
+                echo "✗ GCP 인증 파일 복사 실패, keys 디렉토리 생성 후 재시도"
+                mkdir -p ~/popcong/keys
+                cp ~/popcong/secrets/popcong-c9addd5f509d.json ~/popcong/keys/popcong-c9addd5f509d.json
+            }
+            
+            # 파일 권한 설정 (컨테이너가 읽을 수 있도록)
+            echo "[Step 4] 파일 권한 설정"
+            chmod 644 ~/popcong/config/application-prod.yml      # 모든 사용자 읽기 가능
+            chmod 644 ~/popcong/config/application-secret.yml    # 모든 사용자 읽기 가능
+            chmod 644 ~/popcong/secrets/popcong-c9addd5f509d.json # 모든 사용자 읽기 가능
+            chmod 644 ~/popcong/keys/popcong-c9addd5f509d.json    # keys 디렉토리의 파일도 권한 설정
+            
+            # 디렉토리 권한도 설정
+            chmod 755 ~/popcong/config
+            chmod 755 ~/popcong/secrets
+            chmod 755 ~/popcong/keys
+            
+            # 파일 생성 확인
+            echo "[Step 5] 파일 생성 확인"
+            if [ ! -f ~/popcong/config/application-prod.yml ]; then
+                echo "✗ application-prod.yml 생성 실패"
+                exit 1
+            fi
+            if [ ! -f ~/popcong/config/application-secret.yml ]; then
+                echo "✗ application-secret.yml 생성 실패"
+                exit 1
+            fi
+            if [ ! -f ~/popcong/keys/popcong-c9addd5f509d.json ]; then
+                echo "✗ GCP 인증 파일(keys) 생성 실패"
+                exit 1
+            fi
+            echo "✓ 모든 설정 파일 생성 완료"
+            
+            # ECR 로그인
+            echo "[Step 6] ECR 로그인"
             AWS_REGION="${{ env.AWS_REGION }}"
             ACCOUNT_ID="${{ env.ACCOUNT_ID }}"
             REGISTRY="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
             
-            echo "========================================"
-            echo "배포 시작: $(date)"
-            echo "========================================"
-
-            echo "[Step 1] ECR 로그인"
-            aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"
-            
-            if [ $? -eq 0 ]; then
-                echo "✓ ECR 로그인 성공"
-            else
+            if ! aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRY"; then
                 echo "✗ ECR 로그인 실패"
                 exit 1
             fi
-
-            echo "[Step 2] 디렉토리 이동"
+            echo "✓ ECR 로그인 성공"
+            
+            # 작업 디렉토리 이동
+            echo "[Step 7] 작업 디렉토리 이동"
             cd ~/popcong
             
             if [ ! -f "docker-compose.yml" ]; then
                 echo "✗ docker-compose.yml 파일을 찾을 수 없습니다"
                 exit 1
             fi
-
-            echo "[Step 3] 기존 컨테이너 정리"
-            docker compose down --remove-orphans || true
-
-            echo "[Step 4] 최신 이미지 Pull"
-            docker compose pull
             
-            if [ $? -eq 0 ]; then
-                echo "✓ 이미지 Pull 성공"
-            else
+            # 기존 컨테이너 정리
+            echo "[Step 8] 기존 컨테이너 정리"
+            docker compose down --remove-orphans || true
+            
+            # 이미지 Pull
+            echo "[Step 9] 최신 이미지 Pull"
+            if ! docker compose pull; then
                 echo "✗ 이미지 Pull 실패"
                 exit 1
             fi
-
-            echo "[Step 5] 컨테이너 시작"
-            docker compose up -d --remove-orphans
+            echo "✓ 이미지 Pull 성공"
             
-            if [ $? -eq 0 ]; then
-                echo "✓ 컨테이너 시작 성공"
-            else
+            # 컨테이너 시작
+            echo "[Step 10] 컨테이너 시작"
+            if ! docker compose up -d --remove-orphans; then
                 echo "✗ 컨테이너 시작 실패"
                 exit 1
             fi
-
-            echo "[Step 6] 상태 확인"
-            sleep 5
+            echo "✓ 컨테이너 시작 성공"
+            
+            # 잠시 대기 후 상태 확인
+            echo "[Step 11] 상태 확인"
+            sleep 10
             docker compose ps
+            docker compose logs --tail=50
             
             echo "========================================"
             echo "배포 완료: $(date)"
