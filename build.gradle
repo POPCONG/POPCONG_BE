@@ -84,6 +84,9 @@ dependencies {
 	implementation 'com.google.api-client:google-api-client:2.7.2' // Google API Client
 	implementation 'com.google.apis:google-api-services-drive:v3-rev20250511-2.0.0' // Google Drive
 	implementation 'com.google.auth:google-auth-library-oauth2-http:1.20.0' // Google Auth
+
+	// Redis
+	implementation "org.springframework.boot:spring-boot-starter-data-redis"
 }
 
 // Q타입 엔티티가 생성될 경로

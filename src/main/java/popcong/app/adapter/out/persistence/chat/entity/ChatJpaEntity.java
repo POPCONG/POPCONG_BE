@@ -41,7 +41,12 @@ public class ChatJpaEntity {
     @Column(name = "lastMessageAt", nullable = false)
     private LocalDateTime lastMessageAt;
 
-    @Column(name = "lastReadAt", nullable = false)
+    @Column(name = "lastReadAt")
     private LocalDateTime lastReadAt;
 
+    @Column(name = "guestLastReadAt")
+    private LocalDateTime guestLastReadAt;
+
+    @Column(name = "hostLastReadAt")
+    private LocalDateTime hostLastReadAt;
 }

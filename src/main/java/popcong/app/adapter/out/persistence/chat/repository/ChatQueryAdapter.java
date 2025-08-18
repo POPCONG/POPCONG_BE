@@ -48,6 +48,8 @@ public class ChatQueryAdapter implements ChatRoomPort {
                 .createdAt(chat.createdAt())
                 .lastMessageAt(chat.lastMessageAt())
                 .lastReadAt(chat.lastReadAt())
+                .guestLastReadAt(chat.guestLastReadAt())
+                .hostLastReadAt(chat.hostLastReadAt())
                 .build();
 
         ChatJpaEntity saved = chatJpaRepository.save(entity);

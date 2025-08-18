@@ -52,7 +52,7 @@ public class ChatRoomService implements ChatRoomUseCase {
             chat = existing.get();
         } else {
             LocalDateTime now = LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul")));
-            Chat toSave = new Chat(null, userId, hostId, spaceId, now, now, now);
+            Chat toSave = new Chat(null, userId, hostId, spaceId, now, now, now, now, now);
 
             try {
                 chat = chatRoomPort.save(toSave);

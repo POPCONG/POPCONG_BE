@@ -24,7 +24,9 @@ public class ChatMapper {
                 spaceId,
                 entity.getCreatedAt(),
                 entity.getLastMessageAt(),
-                entity.getLastReadAt()
+                entity.getLastReadAt(),
+                entity.getGuestLastReadAt(),
+                entity.getHostLastReadAt()
         );
     }
 }

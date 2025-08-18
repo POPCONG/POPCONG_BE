@@ -1,0 +1,18 @@
+package popcong.app.adapter.out.persistence.chat.repository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import popcong.app.adapter.out.persistence.chat.entity.MessageJpaEntity;
+
+import java.time.LocalDateTime;
+
+public interface MessageJpaRepository extends JpaRepository<MessageJpaEntity, Long> {
+
+    // 메시지 작성시간 순으로 조회
+    Page<MessageJpaEntity> findByChat_ChatIdOrderByCreatedAtAsc(Long chatId, Pageable pageable);
+
+    // 안읽음 메시지 계산
+    long countByChat_ChatIdAndSender_UserIdAndCreatedAtAfter(Long chatId, Long senderId, LocalDateTime createdAt);
+
+}
