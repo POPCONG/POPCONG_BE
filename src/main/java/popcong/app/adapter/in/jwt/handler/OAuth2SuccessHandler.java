@@ -107,7 +107,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //        String redirectUrl = base + (isRegistered ? mainPath : signupPath);
         String path = isRegistered ? mainPath : signupPath;
         // 토큰을 Fragment로 전달하도록 수정
-        String redirectUrl = String.format("%s%s#access_token=%s&refresh_token=%s",
+        String redirectUrl = String.format("%s%s?access_token=%s&refresh_token=%s",
                 base, path, accessToken, refreshToken);
 
         removeCookie(response, "login_redirect", "/");
