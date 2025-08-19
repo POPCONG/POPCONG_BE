@@ -1,16 +1,15 @@
 package popcong.app.application.user.dto.response;
 
-import popcong.app.application.space.dto.response.MyPopupItemResponseDto;
 import java.util.List;
 
 public record HomeUserResponseDto(
         UserInfoResponseDto userInfo,
-        List<MyPopupItemResponseDto> myPopups
+        List<MyReservationItemDto> myReservations
 ) {
-    public static HomeUserResponseDto from(UserResponseDto user, List<MyPopupItemResponseDto> popups) {
+    public static HomeUserResponseDto from(UserResponseDto user, List<MyReservationItemDto> reservations) {
         return new HomeUserResponseDto(
                 UserInfoResponseDto.from(user),
-                popups
+                reservations
         );
     }
 }
