@@ -25,7 +25,8 @@ public class SpaceController {
 
     @GetMapping("/markers")
     public ResponseDto<MarkerListResponseDto> getMarkers(
-            @RequestBody CurrentUserLocationRequestDto request,
+            @RequestParam(name = "lat") Double lat,
+            @RequestParam(name = "lng") Double lng,
             @RequestParam(name = "nw-lat") Double nwLat,
             @RequestParam(name = "nw-lng") Double nwLng,
             @RequestParam(name = "se-lat") Double seLat,
@@ -36,7 +37,7 @@ public class SpaceController {
             @RequestParam(name = "rating", required = false) Double rating,
             @RequestParam(name = "sort", defaultValue = "MOST_POPULAR") SpaceSortType sort
     ){
-        if (request == null) {
+        if (lat == null || lng == null) {
             throw new BusinessException(SpaceErrorCode.USER_LOCATION_REQUIRED);
         }
 
@@ -44,11 +45,8 @@ public class SpaceController {
             throw new BusinessException(SpaceErrorCode.INVALID_PRICE_ERROR);
         }
 
-        Double userLat = (request != null) ? request.latitude()  : null;
-        Double userLng = (request != null) ? request.longitude() : null;
-
         var markers = spaceMapQueryUseCase.getMarkerInDisplayWithFilters(
-                userLat, userLng,
+                lat, lng,
                 nwLat, nwLng, seLat, seLng,
                 minAmount, maxAmount, floor, rating, sort
         );
