@@ -104,7 +104,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .orElse(null);
 
         String base = resolveAllowedBase(desired, frontendBaseUrl);
-        String redirectUrl = base + (isRegistered ? mainPath : signupPath);
+//        String redirectUrl = base + (isRegistered ? mainPath : signupPath);
+        String path = isRegistered ? mainPath : signupPath;
+        // 토큰을 Fragment로 전달하도록 수정
+        String redirectUrl = String.format("%s%s#access_token=%s&refresh_token=%s",
+                base, path, accessToken, refreshToken);
 
         removeCookie(response, "login_redirect", "/");
 
@@ -112,35 +116,35 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 
-    private void addCookie(
-            HttpServletResponse response,
-            String name,
-            String value,
-            String path,
-            long maxAgeSeconds
-    ) {
-        ResponseCookie cookie = ResponseCookie.from(name, value)
+    private void addCookie(HttpServletResponse response, String name, String value, String path, long maxAgeSeconds) {
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .sameSite(cookieSameSite)
-                .domain(cookieDomain)
                 .path(path)
-                .maxAge(Duration.ofSeconds(maxAgeSeconds))
-                .build();
+                .maxAge(Duration.ofSeconds(maxAgeSeconds));
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        // 로컬에서는 domain 미지정(Host-Only). 운영에서만 설정.
+        if (cookieDomain != null && !cookieDomain.isBlank()) {
+            builder = builder.domain(cookieDomain);
+        }
+
+        response.addHeader(HttpHeaders.SET_COOKIE, builder.build().toString());
     }
 
     private void removeCookie(HttpServletResponse response, String name, String path) {
-        ResponseCookie cookie = ResponseCookie.from(name, "")
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(name, "")
                 .httpOnly(true)
                 .secure(cookieSecure)
                 .sameSite(cookieSameSite)
-                .domain(cookieDomain)
                 .path(path)
-                .maxAge(Duration.ZERO) // 삭제
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+                .maxAge(Duration.ZERO);
+
+        if (cookieDomain != null && !cookieDomain.isBlank() && !"localhost".equalsIgnoreCase(cookieDomain)) {
+            builder = builder.domain(cookieDomain);
+        }
+
+        response.addHeader(HttpHeaders.SET_COOKIE, builder.build().toString());
     }
 
     private Optional<String> readCookie(HttpServletRequest request, String name) {

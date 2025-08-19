@@ -1,5 +1,7 @@
 package popcong.app.application.user.port.out;
 
+import popcong.app.application.user.dto.response.MyWishItemDto;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
