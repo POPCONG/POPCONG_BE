@@ -16,8 +16,12 @@ public enum SpaceErrorCode implements ErrorCode {
     UNSUPPORTED_SORT_TYPE(HttpStatus.BAD_REQUEST.value(), "S4002", "지원하지 않는 정렬 타입입니다."),
     INVALID_BOUDING_BOX(HttpStatus.BAD_REQUEST.value(), "S4003", "탐색 범위가 잘못됐습니다."),
     USER_LOCATION_REQUIRED(HttpStatus.BAD_REQUEST.value(), "S4004", "사용자의 현재 위치 정보가 필요합니다."),
-    MISSING_OR_INVALID_SPACE_ID(400, "C4001", "spaceId 값이 비어있거나 유효하지 않습니다."),
+    MISSING_OR_INVALID_SPACE_ID(HttpStatus.BAD_REQUEST.value(), "C4001", "spaceId 값이 비어있거나 유효하지 않습니다."),
+
     SPACE_NOT_FOUND(404, "C4002", "요청한 공간을 찾을 수 없습니다.");
+
+
+
     private final int httpStatus;
     private final String code;
     private final String message;

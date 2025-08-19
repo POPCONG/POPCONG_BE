@@ -91,7 +91,8 @@ public class SpaceQueryService implements SpaceQueryUseCase {
                 space.deposit(),
                 space.geoAdvantage(),
                 isWished,
-                reviewCount
+                reviewCount,
+                space.maxPeriod()
         );
     }
 }

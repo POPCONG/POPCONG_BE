@@ -12,5 +12,6 @@ public record PopularSpaceInfoDto(
    Integer deposit,
    String geoAdvantage,
    Boolean isWished,
-   Long reviewCount
+   Long reviewCount,
+   Integer maxPeriod
 ) {}

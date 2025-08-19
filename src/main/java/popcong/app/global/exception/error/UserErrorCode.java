@@ -2,6 +2,7 @@ package popcong.app.global.exception.error;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import popcong.app.global.exception.ErrorCode;
 
 @Getter
@@ -11,7 +12,9 @@ public enum UserErrorCode implements ErrorCode {
     // wishlist 4xx
 
     ALREADY_LIKED(400, "C4003", "이미 좋아요를 누른 공간입니다."),
-    NOT_LIKED(400, "C4004", "좋아요 상태가 아닌 공간입니다.");
+    NOT_LIKED(400, "C4004", "좋아요 상태가 아닌 공간입니다."),
+
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "C4045", "사용자를 찾을 수 없습니다."),;
 
     private final int httpStatus;
     private final String code;

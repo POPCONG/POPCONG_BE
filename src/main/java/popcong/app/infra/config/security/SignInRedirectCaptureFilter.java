@@ -22,8 +22,9 @@ import java.util.Set;
 public class SignInRedirectCaptureFilter extends OncePerRequestFilter {
 
     private static final Set<String> ALLOW_LIST = Set.of(
-            "http://localhost:3000",
-            "http://popcong.com" // 배포 도메인 (수정)
+            "http://localhost:8080",
+            "http://localhost:5137",
+            "https://popcong.vercel.app/"
     );
 
     @Override
