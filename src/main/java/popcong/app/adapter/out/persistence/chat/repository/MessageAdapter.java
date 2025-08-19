@@ -41,6 +41,10 @@ public class MessageAdapter implements MessagePort {
 
         MessageJpaEntity saved = messageJpaRepository.save(entity);
 
+        // 최신 메시지 시간 갱신
+        chatReference.updateLastMessageAt(saved.getCreatedAt());
+//        chatRefUpdateLastMessageAt(chatReference, saved.getCreatedAt());
+
         return messageMapper.toDomain(saved);
     }
 
@@ -54,5 +58,9 @@ public class MessageAdapter implements MessagePort {
     @Override
     public long countUnreadFromOpponent(Long chatId, Long opponentId, LocalDateTime after) {
         return messageJpaRepository.countByChat_ChatIdAndSender_UserIdAndCreatedAtAfter(chatId, opponentId, after);
+    }
+
+    private void chatRefUpdateLastMessageAt(ChatJpaEntity chat, LocalDateTime at) {
+        chat.updateLastMessageAt(at);
     }
 }

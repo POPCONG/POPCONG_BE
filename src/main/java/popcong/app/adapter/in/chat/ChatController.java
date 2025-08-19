@@ -9,12 +9,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import popcong.app.application.chat.dto.request.CreateChatRequestDto;
+import popcong.app.application.chat.dto.request.SendMessageRequestDto;
 import popcong.app.application.chat.dto.response.ChatListResponseDto;
 import popcong.app.application.chat.dto.response.CreateChatResponseDto;
 import popcong.app.application.chat.dto.response.MarkReadDto;
-import popcong.app.application.chat.port.in.ChatRoomUseCase;
-import popcong.app.application.chat.port.in.ListMyChatUseCase;
-import popcong.app.application.chat.port.in.ReadMarkerUseCase;
+import popcong.app.application.chat.port.in.*;
+import popcong.app.application.chat.dto.response.SendMessageResponseDto;
 import popcong.app.domain.user.model.User;
 import popcong.app.global.dto.ResponseDto;
 import popcong.app.global.exception.custom.BusinessException;
@@ -32,6 +32,7 @@ public class ChatController {
     private final ChatRoomUseCase chatRoomUseCase;
     private final ReadMarkerUseCase readMarkerUseCase;
     private final ListMyChatUseCase listMyChatUseCase;
+    private final SendMessageUseCase sendMessageUseCase;
 
     // 채팅방 생성
     @PostMapping("/create-chat")
@@ -87,6 +88,24 @@ public class ChatController {
                 data
         );
     }
+
+    @PostMapping(value = "/{chatId}/messages", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseDto<SendMessageResponseDto> sendMessage(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long chatId,
+            @RequestBody SendMessageRequestDto request
+    ) {
+        if (user == null) throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
+
+        SendMessageResponseDto data = sendMessageUseCase.send(chatId, user.userId(), request.message());
+
+        return new ResponseDto<>(
+                HttpStatus.OK.value(),
+                "메시지 전송 성공",
+                data
+        );
+    }
+
 
 
 }

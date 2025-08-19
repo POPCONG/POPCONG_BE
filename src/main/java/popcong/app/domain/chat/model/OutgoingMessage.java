@@ -2,7 +2,7 @@ package popcong.app.domain.chat.model;
 
 import java.time.LocalDateTime;
 
-public record Message(
+public record OutgoingMessage(
         Long messageId,
         Long chatId,
         Long senderId,

@@ -1,4 +1,4 @@
-package popcong.app.infra.config.chat;
+package popcong.app.domain.chat.model;
 
 import lombok.experimental.UtilityClass;
 

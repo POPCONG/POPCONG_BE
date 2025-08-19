@@ -52,7 +52,11 @@ public class ChatJpaEntity {
 
     @Version
     private Long version;
-    
+
+    public void updateLastMessageAt(LocalDateTime at) {
+        this.lastMessageAt = at;
+    }
+
     public void updateGuestLastReadAt(LocalDateTime at) {
         if (at == null) return;
         if (this.guestLastReadAt == null || this.guestLastReadAt.isBefore(at)) {

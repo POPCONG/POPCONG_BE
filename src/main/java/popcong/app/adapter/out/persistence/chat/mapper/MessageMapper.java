@@ -9,6 +9,7 @@ public class MessageMapper {
 
     public Message toDomain(MessageJpaEntity entity) {
         return new Message(
+                entity.getId(),
                 entity.getChat().getChatId(),
                 entity.getSender().getUserId(),
                 entity.getContent(),
