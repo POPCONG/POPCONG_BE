@@ -26,6 +26,7 @@ public class SpaceMapper {
                 entity.getLocation(),
                 entity.getLatitude(),
                 entity.getLongitude(),
+                entity.getGeoAdvantage(),
                 entity.getStatus(),
                 entity.getViews()
         );

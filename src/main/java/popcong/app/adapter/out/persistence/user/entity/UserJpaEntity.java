@@ -59,4 +59,17 @@ public class UserJpaEntity {
 
     @Column(name = "deletedAt")
     private LocalDateTime deletedAt;
+
+    //변경 메서드
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public void changeProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }

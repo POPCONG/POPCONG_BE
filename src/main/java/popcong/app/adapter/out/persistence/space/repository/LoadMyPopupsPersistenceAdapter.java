@@ -1,4 +1,4 @@
-package popcong.app.adapter.out.persistence.space;
+package popcong.app.adapter.out.persistence.space.repository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import popcong.app.adapter.out.persistence.space.entity.PopupJpaEntity;
 import popcong.app.adapter.out.persistence.space.mapper.PopupEntityMapper;
-import popcong.app.adapter.out.persistence.space.repository.PopupJpaRepository;
 import popcong.app.application.space.dto.response.MyPopupItemResponseDto;
 import popcong.app.application.user.port.out.LoadMyPopupsPort;
 
