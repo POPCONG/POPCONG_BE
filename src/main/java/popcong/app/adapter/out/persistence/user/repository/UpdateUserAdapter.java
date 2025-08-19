@@ -24,6 +24,5 @@ public class UpdateUserAdapter implements UpdateUserPort {
         if (introduction != null) user.changeIntroduction(introduction);
         if (profileImageUrl != null) user.changeProfileImageUrl(profileImageUrl);
 
-
     }
 }

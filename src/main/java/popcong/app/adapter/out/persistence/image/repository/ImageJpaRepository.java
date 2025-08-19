@@ -16,4 +16,6 @@ public interface ImageJpaRepository extends JpaRepository<ImageJpaEntity, Long> 
     List<ImageJpaEntity> findByImageableIdAndImageableTypeOrderBySaveOrderAsc(
             Long imageableId, ImageableType imageableType
     );
+
+    void deleteByImageableTypeAndImageableId(ImageableType imageableType, Long imageableId);
 }

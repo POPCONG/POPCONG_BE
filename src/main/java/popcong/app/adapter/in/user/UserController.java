@@ -8,7 +8,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import popcong.app.application.auth.port.in.GoogleDriveSubmitUseCase;
+import popcong.app.application.image.port.out.ProfileImageUploadPort;
+import popcong.app.application.image.service.ProfileImageService;
+import popcong.app.application.user.dto.response.MyProfileResponseDto;
 import popcong.app.application.user.dto.response.UserResponseDto;
+import popcong.app.application.user.port.in.GetMyProfileUseCase;
+import popcong.app.application.user.port.in.UpdateMyProfileUseCase;
 import popcong.app.application.user.port.in.UserInfoUseCase;
 import popcong.app.domain.user.model.DocumentType;
 import popcong.app.domain.user.model.SignUpUserType;
@@ -30,6 +35,11 @@ public class UserController {
 
     private final GoogleDriveSubmitUseCase googleDriveSubmitUseCase;
     private final UserInfoUseCase userInfoUseCase;
+
+    private final GetMyProfileUseCase getMyProfileUseCase;
+    private final UpdateMyProfileUseCase updateMyProfileUseCase;
+    private final ProfileImageService profileImageService;
+    private final ProfileImageUploadPort profileImageUploadPort;
 
 
     /**
@@ -138,5 +148,42 @@ public class UserController {
                 "사용자 조회 성공",
                 result
         );
+    }
+
+    // 내 프로필 조회
+    @GetMapping("/mypage/me")
+    public ResponseDto<MyProfileResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
+        if (user == null) throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
+
+        MyProfileResponseDto dto = getMyProfileUseCase.get(user.userId());
+
+        return new ResponseDto<>(
+                HttpStatus.OK.value(),
+                "내 프로필 조회 성공",
+                dto
+        );
+    }
+
+    //프로필 편집
+    @PatchMapping(value = "/my/update-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseDto<Void> updateMyProfile(
+            @AuthenticationPrincipal User user,
+            @RequestPart(required = false) String name,
+            @RequestPart(required = false) String introduction,
+            @RequestPart(required = false) MultipartFile profileImage
+    ) {
+        if (user == null) throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
+
+        String profileImageUrl = null;
+        if (profileImage != null && !profileImage.isEmpty()) {
+            // S3 업로드 + IMAGE 테이블 반영 + USER.profile_image_url 동기화
+            profileImageUrl = profileImageUploadPort.uploadProfileImage(user.userId(), profileImage);
+
+        }
+        updateMyProfileUseCase.update(user.userId(), name, introduction, profileImageUrl);
+        return new ResponseDto<>(
+                HttpStatus.OK.value(),
+                "프로필 편집 성공",
+                null);
     }
 }
