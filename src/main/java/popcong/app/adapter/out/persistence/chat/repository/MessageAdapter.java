@@ -51,7 +51,7 @@ public class MessageAdapter implements MessagePort {
     // 메시지 내역 조회
     @Override
     public Page<Message> findByChat(Long chatId, Pageable pageable) {
-        return messageJpaRepository.findByChat_ChatIdOrderByCreatedAtAsc(chatId, pageable)
+        return messageJpaRepository.findByChat_ChatId(chatId, pageable)
                 .map(messageMapper::toDomain);
     }
 

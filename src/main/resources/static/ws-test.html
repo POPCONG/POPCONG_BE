@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<body>
+<h3>Chat Real-time Test</h3>
+<div>
+    <label>Chat ID: <input id="chatId" value="100"></label>
+    <button id="connectBtn">Connect & Subscribe</button>
+</div>
+<pre id="log" style="border:1px solid #ccc;padding:8px;height:200px;overflow:auto;"></pre>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script>
+    const log = (m) => {
+        const el = document.getElementById('log');
+        el.textContent += m + "\n";
+        el.scrollTop = el.scrollHeight;
+    };
+
+    document.getElementById('connectBtn').onclick = () => {
+        const chatId = document.getElementById('chatId').value;
+        const sock = new SockJS('http://localhost:8080/ws');
+        const stomp = Stomp.over(sock);
+        stomp.debug = null;
+
+        stomp.connect({}, () => {
+            log('Connected');
+            const topic = '/topic/chat.' + chatId;
+            stomp.subscribe(topic, (frame) => {
+                log('RECV: ' + frame.body);
+            });
+            log('Subscribed: ' + topic);
+        }, (err) => log('ERROR: ' + err));
+    };
+</script>
+</body>
+</html>

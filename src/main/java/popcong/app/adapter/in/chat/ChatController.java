@@ -2,19 +2,20 @@ package popcong.app.adapter.in.chat;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import popcong.app.application.chat.dto.request.CreateChatRequestDto;
 import popcong.app.application.chat.dto.request.SendMessageRequestDto;
-import popcong.app.application.chat.dto.response.ChatListResponseDto;
-import popcong.app.application.chat.dto.response.CreateChatResponseDto;
-import popcong.app.application.chat.dto.response.MarkReadDto;
+import popcong.app.application.chat.dto.response.*;
 import popcong.app.application.chat.port.in.*;
-import popcong.app.application.chat.dto.response.SendMessageResponseDto;
+import popcong.app.application.chat.port.out.MessagePort;
+import popcong.app.domain.chat.model.Message;
 import popcong.app.domain.user.model.User;
 import popcong.app.global.dto.ResponseDto;
 import popcong.app.global.exception.custom.BusinessException;
@@ -33,6 +34,7 @@ public class ChatController {
     private final ReadMarkerUseCase readMarkerUseCase;
     private final ListMyChatUseCase listMyChatUseCase;
     private final SendMessageUseCase sendMessageUseCase;
+    private final MessagePort messagePort;
 
     // 채팅방 생성
     @PostMapping("/create-chat")
@@ -106,6 +108,37 @@ public class ChatController {
         );
     }
 
+    @GetMapping("/{chatId}/messages")
+    public ResponseDto<Page<MessageDto>> getChatHistory(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long chatId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size
+    ) {
+        if (user == null) throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
 
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id"))
+        );
 
+        Page<Message> result = messagePort.findByChat(chatId, pageable);
+
+        Page<MessageDto> data = result.map(message ->
+                new MessageDto(
+                        message.messageId(),
+                        message.chatId(),
+                        message.senderId(),
+                        message.content(),
+                        message.createdAt()
+                )
+        );
+
+        return new ResponseDto<>(
+                HttpStatus.OK.value(),
+                "메시지 조회 성공",
+                data
+        );
+    }
 }
