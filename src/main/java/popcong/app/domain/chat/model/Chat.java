@@ -9,6 +9,8 @@ public record Chat(
         Long spaceId,
         LocalDateTime createdAt,
         LocalDateTime lastMessageAt,
-        LocalDateTime lastReadAt
+        LocalDateTime lastReadAt,
+        LocalDateTime guestLastReadAt,
+        LocalDateTime hostLastReadAt
 ) {
 }

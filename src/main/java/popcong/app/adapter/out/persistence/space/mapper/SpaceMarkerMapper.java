@@ -28,7 +28,8 @@ public class SpaceMarkerMapper {
                 space.floor(),
                 space.rating(),
                 reviewCount,
-                straightDistance
+                straightDistance,
+                space.maxPeriod()
         );
     }
 }
