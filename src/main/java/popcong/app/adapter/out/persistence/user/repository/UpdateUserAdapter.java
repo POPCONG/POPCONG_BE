@@ -17,13 +17,14 @@ public class UpdateUserAdapter implements UpdateUserPort {
 
     @Override
     @Transactional
-    public void updateProfile(Long userId, String name, String introduction, String profileImageUrl, UserRole role) {
+    public void updateProfile(Long userId, String name, String introduction, String profileImageUrl) {
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(AuthErrorCode.USER_NOT_FOUND));
 
         if (name != null) user.changeName(name);
         if (introduction != null) user.changeIntroduction(introduction);
         if (profileImageUrl != null) user.changeProfileImageUrl(profileImageUrl);
-        if (role != null) user.changeRole(role);
+
+        user.changeRole(UserRole.GENERAL);
     }
 }

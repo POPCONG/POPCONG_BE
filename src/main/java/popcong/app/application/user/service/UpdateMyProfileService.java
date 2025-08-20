@@ -18,9 +18,9 @@ public class UpdateMyProfileService implements UpdateMyProfileUseCase {
     /** name/introduction/profileImageUrl 각각 null 이면 “해당 항목은 변경 없음” 처리 */
     @Transactional
     @Override
-    public void update(Long userId, String name, String introduction, String profileImageUrl, UserRole role) {
+    public void update(Long userId, String name, String introduction, String profileImageUrl) {
         // 이름/소개만 업데이트
-        updateUserPort.updateProfile(userId, name, introduction, profileImageUrl,  role);
+        updateUserPort.updateProfile(userId, name, introduction, profileImageUrl);
 
         // 프로필 이미지는 ProfileImageService로 위임
         if (profileImageUrl != null) {
