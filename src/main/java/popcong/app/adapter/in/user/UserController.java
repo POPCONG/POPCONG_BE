@@ -167,8 +167,7 @@ public class UserController {
             @AuthenticationPrincipal User user,
             @RequestPart(required = false) String name,
             @RequestPart(required = false) String introduction,
-            @RequestPart(required = false) MultipartFile profileImage,
-            @RequestParam UserRole role
+            @RequestPart(required = false) MultipartFile profileImage
     ) {
         if (user == null) throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
 
@@ -178,7 +177,7 @@ public class UserController {
             profileImageUrl = profileImageUploadPort.uploadProfileImage(user.userId(), profileImage);
 
         }
-        updateMyProfileUseCase.update(user.userId(), name, introduction, profileImageUrl, role);
+        updateMyProfileUseCase.update(user.userId(), name, introduction, profileImageUrl);
         return new ResponseDto<>(
                 HttpStatus.OK.value(),
                 "프로필 편집 성공",
