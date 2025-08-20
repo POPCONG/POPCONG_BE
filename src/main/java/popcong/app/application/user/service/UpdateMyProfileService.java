@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import popcong.app.application.image.service.ProfileImageService;
 import popcong.app.application.user.port.in.UpdateMyProfileUseCase;
 import popcong.app.application.user.port.out.UpdateUserPort;
+import popcong.app.domain.user.model.UserRole;
 
 @Service
 @RequiredArgsConstructor
@@ -17,9 +18,9 @@ public class UpdateMyProfileService implements UpdateMyProfileUseCase {
     /** name/introduction/profileImageUrl 각각 null 이면 “해당 항목은 변경 없음” 처리 */
     @Transactional
     @Override
-    public void update(Long userId, String name, String introduction, String profileImageUrl) {
+    public void update(Long userId, String name, String introduction, String profileImageUrl, UserRole role) {
         // 이름/소개만 업데이트
-        updateUserPort.updateProfile(userId, name, introduction, profileImageUrl);
+        updateUserPort.updateProfile(userId, name, introduction, profileImageUrl,  role);
 
         // 프로필 이미지는 ProfileImageService로 위임
         if (profileImageUrl != null) {
