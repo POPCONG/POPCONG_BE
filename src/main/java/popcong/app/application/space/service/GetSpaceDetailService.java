@@ -7,7 +7,7 @@ import popcong.app.adapter.out.persistence.image.entity.ImageJpaEntity;
 import popcong.app.adapter.out.persistence.image.repository.ImageJpaRepository;
 import popcong.app.adapter.out.persistence.space.entity.SpaceJpaEntity;
 import popcong.app.adapter.out.persistence.space.repository.SpaceJpaRepository;
-import popcong.app.application.space.dto.response.SpaceDetailDto;
+import popcong.app.application.space.dto.response.SpaceDetailResponseDto;
 import popcong.app.application.user.port.out.WishQueryPort;
 import popcong.app.domain.image.model.ImageableType;
 
@@ -22,7 +22,7 @@ public class GetSpaceDetailService {
     private final WishQueryPort wishQueryPort;
     private final ImageJpaRepository imageJpaRepository;
 
-    public SpaceDetailDto execute(Long userId, Long spaceId) {
+    public SpaceDetailResponseDto execute(Long userId, Long spaceId) {
         SpaceJpaEntity space = spaceJpaRepository.findById(spaceId)
                 .orElseThrow(() -> new BusinessException(SpaceErrorCode.SPACE_NOT_FOUND));
 
@@ -40,15 +40,30 @@ public class GetSpaceDetailService {
                                 .orElse(null)
                 );
 
-        return new SpaceDetailDto(
+        return new SpaceDetailResponseDto(
                 space.getSpaceId(),
+                userId,
                 space.getSpaceName(),
-                space.getAddress(),
-                space.getRentalFee(),
+                space.getSpaceType(),
+                space.getSpaceApplicationType(),
+                space.getSpaceRentalType(),
+                space.getImageCount(),
+                space.getDescription(),
                 space.getDeposit(),
+                space.getRentalFee(),
+                space.getFloor(),
+                space.getArea(),
                 space.getRating(),
-                cover,
-                wished
+                space.getAddress(),
+                space.getLocation(),
+                space.getLatitude(),
+                space.getLongitude(),
+                space.getGeoAdvantage(),
+                space.getMaxPeriod(),
+                space.getStatus(),
+                space.getViews(),
+                wished,
+                cover
         );
     }
 }

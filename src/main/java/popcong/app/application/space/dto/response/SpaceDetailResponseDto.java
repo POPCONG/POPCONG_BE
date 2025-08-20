@@ -1,6 +1,8 @@
-package popcong.app.domain.space.model;
+package popcong.app.application.space.dto.response;
 
-public record Space(
+import popcong.app.domain.space.model.*;
+
+public record SpaceDetailResponseDto(
         Long spaceId,
         Long userId,
         String spaceName,
@@ -21,6 +23,8 @@ public record Space(
         String geoAdvantage, //인근 전철역
         Integer maxPeriod,
         Status status,
-        Integer views
+        Integer views,
+        Boolean isWished,
+        String coverImageUrl
 ) {
 }
