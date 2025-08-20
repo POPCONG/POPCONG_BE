@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import popcong.app.adapter.out.persistence.user.entity.UserJpaEntity;
 import popcong.app.application.user.port.out.UpdateUserPort;
+import popcong.app.domain.user.model.UserRole;
 import popcong.app.global.exception.custom.BusinessException;
 import popcong.app.global.exception.error.AuthErrorCode;
 
@@ -16,13 +17,13 @@ public class UpdateUserAdapter implements UpdateUserPort {
 
     @Override
     @Transactional
-    public void updateProfile(Long userId, String name, String introduction, String profileImageUrl) {
+    public void updateProfile(Long userId, String name, String introduction, String profileImageUrl, UserRole role) {
         UserJpaEntity user = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(AuthErrorCode.USER_NOT_FOUND));
 
         if (name != null) user.changeName(name);
         if (introduction != null) user.changeIntroduction(introduction);
         if (profileImageUrl != null) user.changeProfileImageUrl(profileImageUrl);
-
+        if (role != null) user.changeRole(role);
     }
 }

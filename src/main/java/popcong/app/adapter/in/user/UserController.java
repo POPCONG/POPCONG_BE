@@ -15,10 +15,7 @@ import popcong.app.application.user.dto.response.UserResponseDto;
 import popcong.app.application.user.port.in.GetMyProfileUseCase;
 import popcong.app.application.user.port.in.UpdateMyProfileUseCase;
 import popcong.app.application.user.port.in.UserInfoUseCase;
-import popcong.app.domain.user.model.DocumentType;
-import popcong.app.domain.user.model.SignUpUserType;
-import popcong.app.domain.user.model.UploadItem;
-import popcong.app.domain.user.model.User;
+import popcong.app.domain.user.model.*;
 import popcong.app.global.dto.ResponseDto;
 import popcong.app.global.exception.custom.BusinessException;
 import popcong.app.global.exception.error.AuthErrorCode;
@@ -170,7 +167,8 @@ public class UserController {
             @AuthenticationPrincipal User user,
             @RequestPart(required = false) String name,
             @RequestPart(required = false) String introduction,
-            @RequestPart(required = false) MultipartFile profileImage
+            @RequestPart(required = false) MultipartFile profileImage,
+            @RequestParam UserRole role
     ) {
         if (user == null) throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
 
@@ -180,7 +178,7 @@ public class UserController {
             profileImageUrl = profileImageUploadPort.uploadProfileImage(user.userId(), profileImage);
 
         }
-        updateMyProfileUseCase.update(user.userId(), name, introduction, profileImageUrl);
+        updateMyProfileUseCase.update(user.userId(), name, introduction, profileImageUrl, role);
         return new ResponseDto<>(
                 HttpStatus.OK.value(),
                 "프로필 편집 성공",
