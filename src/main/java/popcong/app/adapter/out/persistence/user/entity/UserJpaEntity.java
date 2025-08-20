@@ -72,4 +72,8 @@ public class UserJpaEntity {
     public void changeProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
+
+    public void changeRole(UserRole role) {
+        this.userRole = role;
+    }
 }
